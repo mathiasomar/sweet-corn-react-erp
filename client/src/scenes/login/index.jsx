@@ -48,7 +48,7 @@ const Login = () => {
         display="flex"
         alignItems="center"
         width="100%"
-        border={`0.7px solid ${colors.grey[100]}`}
+        // border={`0.7px solid ${colors.grey[100]}`}
         borderRadius="6px"
       >
         <Box width="50%">

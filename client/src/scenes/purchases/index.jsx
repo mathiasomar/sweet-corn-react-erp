@@ -10,7 +10,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 // import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 // import { Popconfirm } from "antd";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import MoneyOutlinedIcon from '@mui/icons-material/MoneyOutlined';
 // import toast from "react-hot-toast";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { fetchPurchases } from "../../api/purchase";
@@ -113,7 +113,7 @@ const Purchases = () => {
             <VisibilityOutlinedIcon />
           </Link>
           <Link
-            to={`/dashboard/edit-purchase/${_id}`}
+            to={`/dashboard/add-purchase-payment/${_id}`}
             style={{
               color: colors.blueAccent[500],
               textDecoration: "none",
@@ -121,20 +121,8 @@ const Purchases = () => {
               marginRight: "10px",
             }}
           >
-            <EditOutlinedIcon />
+            <MoneyOutlinedIcon titleAccess="Add Payment" />
           </Link>
-          {/* <Popconfirm
-            title="Delete the purchase"
-            description="Are you sure to delete this Purchase?"
-            onConfirm={() => confirm(_id)}
-            onCancel={cancel}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button variant="outlined" color="error">
-              <DeleteOutlineIcon />
-            </Button>
-          </Popconfirm> */}
         </Box>
       ),
     },

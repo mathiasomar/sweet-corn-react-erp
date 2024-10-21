@@ -10,7 +10,7 @@ exports.allPurchases = async (req, res, next) => {
 
 exports.purchase = async (req, res, next) => {
     const purchase = await Purchase.findById({ _id: req.params.id }).sort({ createdAt: -1 })
-        .populate({ path: 'supplierId', select: ['name'] })
+        .populate({ path: 'supplierId', select: ['name', 'email', 'phone', 'address'] })
         .then(purchase => res.json(purchase))
         .catch(err => res.json(err))
 }
@@ -24,7 +24,7 @@ exports.addPurchase = async (req, res, next) => {
             return next(new createError("Invalid items array", 400));
         }
 
-        const totalAmount = items.reduce((sum, item) => sum + item.price, 0);
+        const totalAmount = items.reduce((sum, item) => sum + parseInt(item.price), 0);
         const dic = parseInt(req.body.discount) / 100 * totalAmount
         const tx = parseInt(req.body.tax) / 100 * totalAmount
         const ship = parseInt(req.body.shipping)
@@ -40,6 +40,8 @@ exports.addPurchase = async (req, res, next) => {
             shipping: req.body.shipping,
             totalAmount,
             grandTotal,
+            paid: 0,
+            due: grandTotal,
             note: req.body.note,
             status: req.body.status
         })

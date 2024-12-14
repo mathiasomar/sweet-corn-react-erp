@@ -73,68 +73,58 @@ const Products = () => {
     {
       field: "name",
       headerName: "NAME",
-      flex: 1,
       cellClassName: "name-column--cell",
+    },
+    {
+      field: "productimg",
+      headerName: "IMAGE",
+      flex: 2,
     },
     {
       field: "categoryId",
       headerName: "Category",
-      flex: 1,
       renderCell: ({ row: { categoryId } }) => <>{categoryId.name}</>,
     },
     {
-      field: "unit",
-      headerName: "Unit",
-      flex: 1,
-      renderCell: ({ row: { unitvalue, unit } }) => (
-        <>
-          {unitvalue === 1 && `${unitvalue}${unit}`}
-          {unitvalue === 2 && `${unitvalue}${unit}`}
-          {unitvalue === 5 && `${unitvalue}${unit}/(Bag)`}
-          {unitvalue === 10 && `${unitvalue}${unit}/(Bag)`}
-          {unitvalue === 45 && `${unitvalue}${unit}/(Bag)`}
-          {unitvalue === 50 && `${unitvalue}${unit}/(Bag)`}
-        </>
-      ),
-    },
-    {
-      field: "package",
-      headerName: "Packaging",
-      flex: 1,
-      renderCell: ({ row: { package: pkt } }) => (
-        <>
-          {pkt === 1 && `${pkt}pc`}
-          {pkt === 12 && `${pkt}pkts/(Bale)`}
-          {pkt === 24 && `${pkt}pkts/(Bale)`}
-        </>
-      ),
+      field: "brandId",
+      headerName: "Brand",
+      renderCell: ({ row: { brandId } }) => <>{brandId.name}</>,
     },
     {
       field: "sku",
       headerName: "SKU",
     },
     {
+      field: "unitId",
+      headerName: "Unit",
+      renderCell: ({ row: { unitId, unitValue } }) => (
+        <>
+          {unitValue}
+          {unitId.shortname}
+        </>
+      ),
+    },
+    {
       field: "price",
       headerName: "Sale Price",
     },
     {
-      field: "quantity",
-      headerName: "Quantity",
+      field: "stock",
+      headerName: "Stock",
+    },
+    {
+      field: "orderTax",
+      headerName: "TAX",
+      renderCell: ({ row: { orderTax } }) => <>{`${orderTax}%`}</>,
     },
     {
       field: "discount",
       headerName: "Discount",
-      renderCell: ({ row: { discount } }) => <>{discount}%</>,
-    },
-    {
-      field: "vat",
-      headerName: "VAT",
-      renderCell: ({ row: { vat } }) => <>{vat}%</>,
+      renderCell: ({ row: { discount } }) => <>{`${discount}%`}</>,
     },
     {
       field: "action",
       headerName: "Action",
-      flex: 2,
       renderCell: ({ row: { _id } }) => (
         <Box display="flex" alignItems="center" gap="3px" px="10px">
           <Link
@@ -264,6 +254,7 @@ const Products = () => {
       <Box
         m="20px 0 0 0"
         height="75vh"
+        width="100%"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -291,12 +282,9 @@ const Products = () => {
         }}
       >
         {isError ? (
-          <Alert
-          severity="error"
-          className="mb-3"
-        >
-          {error.response.data.error}
-        </Alert>
+          <Alert severity="error" className="mb-3">
+            {error.response.data.error}
+          </Alert>
         ) : (
           <DataGrid
             rows={products}

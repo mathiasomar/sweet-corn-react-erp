@@ -1,20 +1,26 @@
-import { Alert, Box, Button } from "@mui/material";
+import { Alert, Box, Button, IconButton, Menu, MenuItem } from "@mui/material";
 import Header from "../../components/Header";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { tokens } from "../../theme";
 import { useTheme } from "@emotion/react";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 // import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-// import { Popconfirm } from "antd";
-import MoneyOutlinedIcon from '@mui/icons-material/MoneyOutlined';
-// import toast from "react-hot-toast";
+import { Popconfirm } from "antd";
+import MoneyOutlinedIcon from "@mui/icons-material/MoneyOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import AssignmentReturnOutlinedIcon from "@mui/icons-material/AssignmentReturnOutlined";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import toast from "react-hot-toast";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { fetchPurchases } from "../../api/purchase";
+import { deletePurchase, fetchPurchases } from "../../api/purchase";
 import moment from "moment";
+import { Tag } from "antd";
+import { useState } from "react";
 
 const Purchases = () => {
   const theme = useTheme();
@@ -24,23 +30,15 @@ const Purchases = () => {
 
   axios.defaults.headers.common["Authorization"] = token;
 
-  //   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-  //   const createMutation = useMutation({
-  //     mutationFn: deletePurchase,
-  //     onSuccess: (data) => {
-  //       queryClient.invalidateQueries({ queryKey: ["suppliers"] });
-  //       toast.success(data.message);
-  //     },
-  //   });
-
-  //   const confirm = (id) => {
-  //     createMutation.mutate(id);
-  //   };
-  //   const cancel = (e) => {
-  //     console.log(e);
-  //     toast.error("Process Cancelled");
-  //   };
+  const createMutation = useMutation({
+    mutationFn: deletePurchase,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      toast.success(data.message);
+    },
+  });
 
   const {
     isLoading,
@@ -55,8 +53,15 @@ const Purchases = () => {
 
   const columns = [
     {
+      field: "pdate",
+      headerName: "DATE",
+      renderCell: ({ row: { pdate } }) => (
+        <>{moment(pdate).format("YYYY-MM-DD")}</>
+      ),
+    },
+    {
       field: "ref",
-      headerName: "REF N0",
+      headerName: "Reference",
       cellClassName: "name-column--cell",
     },
     {
@@ -64,13 +69,6 @@ const Purchases = () => {
       headerName: "Supplier",
       flex: 2,
       renderCell: ({ row: { supplierId } }) => <>{supplierId.name}</>,
-    },
-    {
-      field: "pdate",
-      headerName: "DATE",
-      renderCell: ({ row: { pdate } }) => (
-        <>{moment(pdate).format("YYYY-MM-DD")}</>
-      ),
     },
     {
       field: "items",
@@ -81,52 +79,128 @@ const Purchases = () => {
     {
       field: "grandTotal",
       headerName: "Grand Total",
-      renderCell: ({ row: { grandTotal } }) => <>{`Ksh.${grandTotal}`}</>,
+      renderCell: ({ row: { grandTotal } }) => (
+        <>{`Ksh.${grandTotal.toLocaleString()}`}</>
+      ),
+    },
+    {
+      field: "paid",
+      headerName: "Paid",
+      renderCell: ({ row: { paid } }) => <>{`Ksh.${paid.toLocaleString()}`}</>,
+    },
+    {
+      field: "due",
+      headerName: "Due",
+      renderCell: ({ row: { due } }) => <>{`Ksh.${due.toLocaleString()}`}</>,
     },
     {
       field: "status",
       headerName: "Status",
       flex: 1,
+      renderCell: ({ row: { status } }) => (
+        <>
+          {status === "pending" && <Tag color="warning">{status}</Tag>}
+          {status === "ordered" && <Tag color="processing">{status}</Tag>}
+          {status === "received" && <Tag color="success">{status}</Tag>}
+        </>
+      ),
     },
     {
-      field: "createdAt",
-      headerName: "Date Created",
-      flex: 2,
-      renderCell: ({ row: { createdAt } }) => (
-        <>{moment(createdAt).format("YYYY-MM-DD HH:m")}</>
+      field: "purchaseStatus",
+      headerName: "Payment Status",
+      flex: 1,
+      renderCell: ({ row: { purchaseStatus } }) => (
+        <>
+          {purchaseStatus === "unpaid" && (
+            <Tag color="warning">{purchaseStatus}</Tag>
+          )}
+          {purchaseStatus === "paid" && (
+            <Tag color="success">{purchaseStatus}</Tag>
+          )}
+        </>
       ),
     },
     {
       field: "action",
       headerName: "Action",
       flex: 2,
-      renderCell: ({ row: { _id } }) => (
-        <Box display="flex" alignItems="center" gap="3px" px="10px">
-          <Link
-            to={`/dashboard/view-purchase/${_id}`}
-            style={{
-              color: colors.greenAccent[500],
-              textDecoration: "none",
-              padding: "2px 5px",
-            }}
-          >
-            <VisibilityOutlinedIcon />
-          </Link>
-          <Link
-            to={`/dashboard/add-purchase-payment/${_id}`}
-            style={{
-              color: colors.blueAccent[500],
-              textDecoration: "none",
-              padding: "2px 5px",
-              marginRight: "10px",
-            }}
-          >
-            <MoneyOutlinedIcon titleAccess="Add Payment" />
-          </Link>
-        </Box>
-      ),
+      renderCell: ({ row: { _id } }) => <ActionDropdown id={_id} />,
     },
   ];
+
+  // Dropdown for each row's actions
+  const ActionDropdown = ({ id }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleAction = (url) => {
+      navigate(url + id);
+      handleClose();
+    };
+
+    const confirm = () => {
+      createMutation.mutate(id);
+    };
+    const cancel = (e) => {
+      console.log(e);
+      toast.error("Process Cancelled");
+    };
+
+    return (
+      <Box display="flex" alignItems="center" gap={2}>
+        <Box>
+          <IconButton
+            aria-label="more"
+            aria-controls="long-menu"
+            aria-haspopup="true"
+            onClick={handleClick}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <MenuItem onClick={() => handleAction(`/dashboard/view-purchase/`)}>
+              <VisibilityOutlinedIcon sx={{ mr: "0.6rem" }} /> View Purchase
+            </MenuItem>
+            <MenuItem onClick={() => handleAction(`/dashboard/edit-purchase/`)}>
+              <EditOutlinedIcon sx={{ mr: "0.6rem" }} /> Edit Purchase
+            </MenuItem>
+            <MenuItem
+              onClick={() => handleAction(`/dashboard/add-purchase-payment/`)}
+            >
+              <MoneyOutlinedIcon sx={{ mr: "0.6rem" }} /> Create Payment
+            </MenuItem>
+            <MenuItem
+              onClick={() => handleAction(`/dashboard/purchase-return/`)}
+            >
+              <AssignmentReturnOutlinedIcon sx={{ mr: "0.6rem" }} /> Purchase
+              Return
+            </MenuItem>
+          </Menu>
+        </Box>
+
+        <Popconfirm
+          title="Delete the product"
+          description="Are you sure to delete this Product?"
+          onConfirm={confirm}
+          onCancel={cancel}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button variant="outlined" color="error">
+            <DeleteOutlineIcon />
+          </Button>
+        </Popconfirm>
+      </Box>
+    );
+  };
   return (
     <Box m="20px">
       <Box display="flex" alignContent="center" justifyContent="space-between">

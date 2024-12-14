@@ -56,7 +56,7 @@ const AddPurchase = () => {
   const createMutation = useMutation({
     mutationFn: addPurchase,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["purchases"] });
       toast.success(data.message);
       navigate("/dashboard/purchases");
     },
@@ -75,7 +75,17 @@ const AddPurchase = () => {
     },
     validationSchema,
     onSubmit: (values) => {
-      createMutation.mutate({ ref: values.ref, supplierId: values.supplierId, pdate: values.pdate, items: items, discount: values.discount, tax: values.tax, shipping: values.shipping, note: values.note, status: values.status });
+      createMutation.mutate({
+        ref: values.ref,
+        supplierId: values.supplierId,
+        pdate: values.pdate,
+        items: items,
+        discount: values.discount,
+        tax: values.tax,
+        shipping: values.shipping,
+        note: values.note,
+        status: values.status,
+      });
     },
   });
 

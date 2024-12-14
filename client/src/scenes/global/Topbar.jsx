@@ -55,7 +55,7 @@ const TopBar = () => {
           variant="h3"
           sx={{ textTransform: "uppercase", fontWeight: "bold" }}
         >
-          sweet corn millers ltd
+          erp e-commerce system
         </Typography>
       </Box>
 

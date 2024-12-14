@@ -160,10 +160,22 @@ const SideBar = () => {
                 Products
               </MenuItem>
               <MenuItem
-                component={<NavLink to="/dashboard/product-adjustment" />}
+                component={<NavLink to="/dashboard/category" />}
                 style={{ backgroundColor: colors.primary[400] }}
               >
-                Product Adjustment
+                Category
+              </MenuItem>
+              <MenuItem
+                component={<NavLink to="/dashboard/brand" />}
+                style={{ backgroundColor: colors.primary[400] }}
+              >
+                Brand
+              </MenuItem>
+              <MenuItem
+                component={<NavLink to="/dashboard/unit" />}
+                style={{ backgroundColor: colors.primary[400] }}
+              >
+                Unit
               </MenuItem>
             </SubMenu>
             <SubMenu label="Purchases" icon={<ReceiptOutlinedIcon />}>

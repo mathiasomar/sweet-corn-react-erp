@@ -1,6 +1,13 @@
 import { useTheme } from "@emotion/react";
 import { tokens } from "../../theme";
-import { Alert, Box, Card, CardContent, TextField, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 // import { useState } from "react";
 import * as yup from "yup";
@@ -39,11 +46,6 @@ const Login = () => {
       height="100vh"
       padding="40px"
     >
-      {error && (
-        <Alert variant="outlined" severity="error">
-          {error}
-        </Alert>
-      )}
       <Box
         display="flex"
         alignItems="center"
@@ -55,6 +57,11 @@ const Login = () => {
           <img src="/assets/loginIcon.png" alt="" width="100%" />
         </Box>
         <Card variant="outlined" sx={{ width: "40%" }}>
+          {error && (
+            <Alert variant="outlined" sx={{ mx: 2, my: 2 }} severity="error">
+              {error}
+            </Alert>
+          )}
           <form autoComplete="off" onSubmit={formik.handleSubmit}>
             <CardContent>
               <Typography

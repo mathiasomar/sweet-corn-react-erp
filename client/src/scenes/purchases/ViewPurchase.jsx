@@ -204,7 +204,7 @@ const ViewPurchase = () => {
                             <TableCell>{item.name}</TableCell>
                             <TableCell>{item.quantity}</TableCell>
                             <TableCell>{item.unit}</TableCell>
-                            <TableCell>Ksh.{item.price}</TableCell>
+                            <TableCell>Ksh.{item.price.toLocaleString()}</TableCell>
                           </TableRow>
                         ))}
                         <TableRow>
@@ -220,27 +220,27 @@ const ViewPurchase = () => {
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell>Shipping</TableCell>
-                          <TableCell>Ksh.{purchase.shipping}</TableCell>
+                          <TableCell>Ksh.{purchase.shipping.toLocaleString()}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell>Total</TableCell>
-                          <TableCell>Ksh.{purchase.totalAmount}</TableCell>
+                          <TableCell>Ksh.{purchase.totalAmount.toLocaleString()}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell>Grand Total</TableCell>
-                          <TableCell>Ksh.{purchase.grandTotal}</TableCell>
+                          <TableCell>Ksh.{purchase.grandTotal.toLocaleString()}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell>Paid</TableCell>
-                          <TableCell>Ksh.{purchase.paid}</TableCell>
+                          <TableCell>Ksh.{purchase.paid.toLocaleString()}</TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={2} />
                           <TableCell>Due</TableCell>
-                          <TableCell>Ksh.{purchase.due}</TableCell>
+                          <TableCell>Ksh.{purchase.due.toLocaleString()}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

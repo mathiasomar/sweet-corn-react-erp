@@ -9,23 +9,23 @@ const productSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category'
     },
-    unit: {
-        type: String,
-        required: true
+    brandId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand'
     },
-    unitvalue: {
+    unitId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Unit'
+    },
+    unitValue: {
         type: Number,
-        required: true
-    },
-    package: {
-        type: "number",
         required: true
     },
     price: {
         type: Number,
         required: true
     },
-    quantity: {
+    stock: {
         type: Number,
         required: true,
     },
@@ -37,14 +37,22 @@ const productSchema = new mongoose.Schema({
     productimg: {
         type: String
     },
-    discount: {
-        type: Number
+    orderTax: {
+        type: Number,
+        default: "0"
     },
-    vat: {
-        type: Number
+    discount: {
+        type: Number,
+        default: "0"
     },
     description: {
         type: String
+    },
+    imei: {
+        type: Boolean,
+    },
+    notForSale: {
+        type: Boolean
     }
 }, { timestamps: true })
 

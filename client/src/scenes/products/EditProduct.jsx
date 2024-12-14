@@ -109,7 +109,7 @@ const EditProduct = () => {
     enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
-        createMutation.mutate({id, ...values});
+      createMutation.mutate({ id, ...values });
     },
   });
 

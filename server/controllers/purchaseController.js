@@ -54,3 +54,13 @@ exports.addPurchase = async (req, res, next) => {
         console.log(error)
     }
 }
+
+exports.deletePurchase = async (req, res, next) => {
+    const id = req.params.id
+    try {
+        await Purchase.findByIdAndDelete({ _id: id })
+        res.status(200).json({ message: "Purchase Deleted Successfully" })
+    } catch (error) {
+        next(error)
+    }
+}

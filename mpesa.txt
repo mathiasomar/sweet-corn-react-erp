@@ -1,0 +1,118 @@
+// Mpesa route API
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/mpesa', (req, res) => {
+  const { BusinessShortCode, CheckoutRequestID, Amount, PhoneNumber, TransactionDesc } = req.body;
+  const payload = {
+    BusinessShortCode,
+    CheckoutRequestID,
+    Amount,
+    PhoneNumber,
+    TransactionDesc,
+  };
+
+  axios.post('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', payload)
+    .then(response => {
+      res.send(response.data);
+    })
+    .catch(error => {
+      res.status(500).send(error.message);
+    });
+});
+
+app.post('/callback', (req, res) => {
+  const { TransactionID, Status } = req.body;
+  // Handle the callback logic here
+  console.log('Transaction ID:', TransactionID);
+  console.log('Status:', Status);
+  res.send('Callback received');
+});
+
+app.listen(3001, () => {
+  console.log('Server running on port 3001');
+});
+
+
+// Front end - creating form to collect M-Pesa payment details
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const MpesaForm = () => {
+  const [businessShortCode, setBusinessShortCode] = useState('');
+  const [checkoutRequestID, setCheckoutRequestID] = useState('');
+  const [amount, setAmount] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [transactionDesc, setTransactionDesc] = useState('');
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const payload = {
+      BusinessShortCode,
+      CheckoutRequestID,
+      Amount,
+      PhoneNumber,
+      TransactionDesc,
+    };
+
+    try {
+      const response = await axios.post('http://localhost:3001/mpesa', payload);
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error processing M-Pesa request:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Business Short Code:
+        <input type="text" value={businessShortCode} onChange={(e) => setBusinessShortCode(e.target.value)} />
+      </label>
+      <label>
+        Checkout Request ID:
+        <input type="text" value={checkoutRequestID} onChange={(e) => setCheckoutRequestID(e.target.value)} />
+      </label>
+      <label>
+        Amount:
+        <input type="text" value={amount} onChange={(e) => setAmount(e.target.value)} />
+      </label>
+      <label>
+        Phone Number:
+        <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+      </label>
+      <label>
+        Transaction Description:
+        <input type="text" value={transactionDesc} onChange={(e) => setTransactionDesc(e.target.value)} />
+      </label>
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default MpesaForm;
+
+// Callback function
+const handleCallback = async (event) => {
+  event.preventDefault();
+  const payload = {
+    TransactionID: 'your_transaction_id',
+    Status: 'your_status',
+  };
+
+  try {
+    const response = await axios.post('http://localhost:3001/callback', payload);
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error handling callback:', error);
+  }
+};
+
+// Add this function to your form or another component as needed
+
+

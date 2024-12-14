@@ -9,6 +9,8 @@ const productRoute = require('./routes/productRoute')
 const categoryRoute = require('./routes/categoryRoute')
 const supplierRoute = require('./routes/supplierRoute')
 const purchaseRoute = require('./routes/purchaseRoute')
+const brandRoute = require('./routes/brandRoute')
+const unitRoute = require('./routes/unitRoute')
 
 const app = express()
 const port = 3000
@@ -24,6 +26,9 @@ app.use('/api/product', productRoute)
 app.use('/api/category', categoryRoute)
 app.use('/api/supplier', supplierRoute)
 app.use('/api/purchase', purchaseRoute)
+app.use('/api/brand', brandRoute)
+app.use('/api/brand', brandRoute)
+app.use('/api/unit', unitRoute)
 
 // CONNECT TO DATABASE
 connectDB(process.env.MONGO_URI)

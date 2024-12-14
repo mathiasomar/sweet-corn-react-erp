@@ -18,6 +18,16 @@ import AddSupplier from "./scenes/suppliers/AddSupplier";
 import EditSupplier from "./scenes/suppliers/EditSupplier";
 import ViewPurchase from "./scenes/purchases/ViewPurchase";
 import AddPurchase from "./scenes/purchases/AddPurchase";
+import EditPurchase from "./scenes/purchases/EditPurchase";
+import Category from "./scenes/products/Category";
+import AddCategory from "./scenes/products/AddCategory";
+import EditCategory from "./scenes/products/EditCategory";
+import Brand from "./scenes/products/Brand";
+import AddBrand from "./scenes/products/AddBrand";
+import EditBrand from "./scenes/products/EditBrand";
+import Unit from "./scenes/products/Unit";
+import AddUnit from "./scenes/products/AddUnit";
+import EditUnit from "./scenes/products/EditUnit";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -52,6 +62,20 @@ function App() {
                 path="/dashboard/edit-product/:id"
                 element={<EditProduct />}
               />
+              <Route path="/dashboard/category" element={<Category />} />
+              <Route path="/dashboard/addcategory" element={<AddCategory />} />
+              <Route
+                path="/dashboard/edit-category/:id"
+                element={<EditCategory />}
+              />
+              <Route path="/dashboard/brand" element={<Brand />} />
+              <Route path="/dashboard/addbrand" element={<AddBrand />} />
+              <Route path="/dashboard/edit-brand/:id" element={<EditBrand />} />
+
+              <Route path="/dashboard/unit" element={<Unit />} />
+              <Route path="/dashboard/addunit" element={<AddUnit />} />
+              <Route path="/dashboard/edit-unit/:id" element={<EditUnit />} />
+
               <Route path="/dashboard/suppliers" element={<Suppliers />} />
               <Route path="/dashboard/addsupplier" element={<AddSupplier />} />
               <Route
@@ -64,6 +88,10 @@ function App() {
                 element={<ViewPurchase />}
               />
               <Route path="/dashboard/addpurchase" element={<AddPurchase />} />
+              <Route
+                path="/dashboard/edit-purchase/:id"
+                element={<EditPurchase />}
+              />
             </Route>
           </Routes>
         </>

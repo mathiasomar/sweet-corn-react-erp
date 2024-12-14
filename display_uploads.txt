@@ -1,0 +1,55 @@
+// Creating upload middleware
+
+const express = require('express');
+const multer = require('multer');
+const mongoose = require('mongoose');
+const app = express();
+
+// Middleware to serve static files
+app.use('/uploads', express.static('uploads'));
+
+// Other configurations...
+
+app.listen(3001, () => {
+  console.log('Server running on port 3001');
+});
+
+
+// Displaying the files
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const FileList = () => {
+  const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/files');
+        setFiles(response.data);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+      }
+    };
+
+    fetchFiles();
+  }, []);
+
+  return (
+    <div>
+      <h2>Uploaded Files</h2>
+      <ul>
+        {files.map((file, index) => (
+          <li key={index}>
+            <a href={`http://localhost:3001/uploads/${file.filename}`} target="_blank" rel="noopener noreferrer">
+              {file.filename}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default FileList;

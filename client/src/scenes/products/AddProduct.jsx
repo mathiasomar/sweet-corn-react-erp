@@ -8,32 +8,35 @@ import {
   Collapse,
   Alert,
   IconButton,
+  Checkbox,
+  InputLabel,
 } from "@mui/material";
 import Header from "../../components/Header";
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
 import { tokens } from "../../theme";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@emotion/react";
 import * as yup from "yup";
 import { useFormik } from "formik";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+// import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import LoadingButton from "@mui/lab/LoadingButton";
 // import { Modal } from "antd";
-import CategoryModal from "../../components/CategoryModal";
+// import CategoryModal from "../../components/CategoryModal";
 import { fetchCategories } from "../../api/category";
 import { addProduct } from "../../api/products";
 import toast from "react-hot-toast";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
+import { fetchBrands } from "../../api/brand";
+import { fetchUnits } from "../../api/unit";
 
 const validationSchema = yup.object({
   name: yup.string().required("Product name is required"),
   categoryId: yup.string(),
   unit: yup.string(),
-  package: yup.number().required("Package is required"),
   price: yup.number().required("Price is required"),
 });
 
@@ -41,21 +44,21 @@ const AddProduct = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [open, setOpen] = useState(true);
-  const [openModal, setOpenModal] = useState(false);
+  // const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const showModal = () => {
-    setOpenModal(true);
-  };
+  // const showModal = () => {
+  //   setOpenModal(true);
+  // };
 
-  const handleOk = () => {
-    setOpenModal(false);
-  };
+  // const handleOk = () => {
+  //   setOpenModal(false);
+  // };
 
-  const handleCancel = () => {
-    setOpenModal(false);
-  };
+  // const handleCancel = () => {
+  //   setOpenModal(false);
+  // };
 
   axios.defaults.headers.common["Authorization"] = token;
 
@@ -74,14 +77,17 @@ const AddProduct = () => {
     initialValues: {
       name: "",
       categoryId: "",
-      unitvalue: 0,
-      unit: "Kg",
-      package: 0,
+      brandId: "",
+      unitId: "",
+      unitValue: 0,
       price: 0,
-      quantity: 0,
+      stock: 0,
       sku: Math.floor(100000 + Math.random() * 900000),
+      orderTax: 0,
       discount: 0,
-      vat: 0,
+      notForSale: false,
+      imei: false,
+      description: "",
     },
     validationSchema,
     onSubmit: (values) => {
@@ -89,18 +95,26 @@ const AddProduct = () => {
     },
   });
 
-  const {
-    isLoading,
-    isError,
-    data: categories,
-    error,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-    staleTime: 1000,
+  const [categoryQuery, brandQuery, unitQuery] = useQueries({
+    queries: [
+      {
+        queryKey: ["categories"],
+        queryFn: fetchCategories,
+        staleTime: 1000,
+      },
+      {
+        queryKey: ["brands"],
+        queryFn: fetchBrands,
+        staleTime: 1000,
+      },
+      {
+        queryKey: ["units"],
+        queryFn: fetchUnits,
+        staleTime: 1000,
+      },
+    ],
   });
 
-  if (isError) return toast.error(error.response.data.error);
   return (
     <Box m="20px">
       <Box display="flex" alignContent="center" justifyContent="space-between">
@@ -142,7 +156,7 @@ const AddProduct = () => {
                 </IconButton>
               }
             >
-              {createMutation.error.response.data.error}
+              {createMutation.error.response.data.message}
             </Alert>
           </Collapse>
         ) : null}
@@ -177,8 +191,8 @@ const AddProduct = () => {
                   <MenuItem value="">
                     <em>Select Category</em>
                   </MenuItem>
-                  {!isLoading ? (
-                    categories.map((cat, index) => (
+                  {!categoryQuery.isLoading ? (
+                    categoryQuery.data.map((cat, index) => (
                       <MenuItem key={index} value={cat._id}>
                         {cat.name}
                       </MenuItem>
@@ -187,7 +201,7 @@ const AddProduct = () => {
                     <CircularProgress />
                   )}
                 </TextField>
-                <Button
+                {/* <Button
                   sx={{
                     p: "5px",
                     height: "100%",
@@ -203,41 +217,57 @@ const AddProduct = () => {
                   openModal={openModal}
                   handleOk={handleOk}
                   handleCancel={handleCancel}
-                />
+                /> */}
               </Box>
             </Grid2>
             <Grid2 size={4}>
               <TextField
+                select
                 fullWidth
-                type="number"
                 variant="filled"
-                label="Unit Value"
-                name="unitvalue"
+                label="Brand"
+                name="brandId"
                 margin="normal"
-                value={formik.values.unitvalue}
+                value={formik.values.brandId}
                 onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={
-                  formik.touched.unitvalue && Boolean(formik.errors.unitvalue)
-                }
-                helperText={formik.touched.unitvalue && formik.errors.unitvalue}
-              />
+              >
+                <MenuItem value="">
+                  <em>Select Brand</em>
+                </MenuItem>
+                {!brandQuery.isLoading ? (
+                  brandQuery.data.map((brand, index) => (
+                    <MenuItem key={index} value={brand._id}>
+                      {brand.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <CircularProgress />
+                )}
+              </TextField>
             </Grid2>
             <Grid2 size={4}>
               <TextField
-                fullWidth
                 select
+                fullWidth
                 variant="filled"
                 label="Unit"
-                name="unit"
+                name="unitId"
                 margin="normal"
-                value={formik.values.unit}
+                value={formik.values.unitId}
                 onChange={formik.handleChange}
               >
-                <MenuItem value="Kg">Kg</MenuItem>
-                <MenuItem value="grams">grams</MenuItem>
-                <MenuItem value="bale">Bale</MenuItem>
-                <MenuItem value="Kg Bag">Kg Bag</MenuItem>
+                <MenuItem value="">
+                  <em>Select Unit</em>
+                </MenuItem>
+                {!unitQuery.isLoading ? (
+                  unitQuery.data.map((unit, index) => (
+                    <MenuItem key={index} value={unit._id}>
+                      {unit.name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <CircularProgress />
+                )}
               </TextField>
             </Grid2>
             <Grid2 size={4}>
@@ -245,14 +275,16 @@ const AddProduct = () => {
                 fullWidth
                 type="number"
                 variant="filled"
-                label="Package"
-                name="package"
+                label="Unit Value"
+                name="unitValue"
                 margin="normal"
-                value={formik.values.package}
+                value={formik.values.unitValue}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.package && Boolean(formik.errors.package)}
-                helperText={formik.touched.package && formik.errors.package}
+                error={
+                  formik.touched.unitValue && Boolean(formik.errors.unitValue)
+                }
+                helperText={formik.touched.unitValue && formik.errors.unitValue}
               />
             </Grid2>
             <Grid2 size={4}>
@@ -280,7 +312,7 @@ const AddProduct = () => {
                 fullWidth
                 type="number"
                 variant="filled"
-                label="Product Price"
+                label="Sale Price"
                 name="price"
                 margin="normal"
                 value={formik.values.price}
@@ -295,16 +327,14 @@ const AddProduct = () => {
                 fullWidth
                 type="number"
                 variant="filled"
-                label="Quantity"
-                name="quantity"
+                label="Stock"
+                name="stock"
                 margin="normal"
-                value={formik.values.quantity}
+                value={formik.values.stock}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={
-                  formik.touched.quantity && Boolean(formik.errors.quantity)
-                }
-                helperText={formik.touched.quantity && formik.errors.quantity}
+                error={formik.touched.stock && Boolean(formik.errors.stock)}
+                helperText={formik.touched.stock && formik.errors.stock}
               />
             </Grid2>
             <Grid2 size={4}>
@@ -329,14 +359,70 @@ const AddProduct = () => {
                 fullWidth
                 type="number"
                 variant="filled"
-                label="VAT(%)"
-                name="vat"
+                label="TAX(%)"
+                name="orderTax"
                 margin="normal"
-                value={formik.values.vat}
+                value={formik.values.orderTax}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched.vat && Boolean(formik.errors.vat)}
-                helperText={formik.touched.vat && formik.errors.vat}
+                error={
+                  formik.touched.orderTax && Boolean(formik.errors.orderTax)
+                }
+                helperText={formik.touched.orderTax && formik.errors.orderTax}
+              />
+            </Grid2>
+            <Grid2 size={4}>
+              <InputLabel>IMEI</InputLabel>
+              <Checkbox
+                type="checkbox"
+                color={colors.primary[400]}
+                name="imei"
+                margin="normal"
+                value={formik.values.imei}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.imei && Boolean(formik.errors.imei)}
+                helperText={formik.touched.imei && formik.errors.imei}
+              />
+            </Grid2>
+            <Grid2 size={4}>
+              <InputLabel>Not for Sale</InputLabel>
+              <Checkbox
+                color={colors.primary[400]}
+                type="checkbox"
+                name="notForSale"
+                margin="normal"
+                value={formik.values.notForSale}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.notForSale && Boolean(formik.errors.notForSale)
+                }
+                helperText={
+                  formik.touched.notForSale && formik.errors.notForSale
+                }
+              />
+            </Grid2>
+            <Grid2 size={12}>
+              <TextField
+                fullWidth
+                type="number"
+                multiline
+                rows={4}
+                variant="filled"
+                label="Description"
+                name="description"
+                margin="normal"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.description &&
+                  Boolean(formik.errors.description)
+                }
+                helperText={
+                  formik.touched.description && formik.errors.description
+                }
               />
             </Grid2>
           </Grid2>

@@ -17,3 +17,7 @@ export async function fetchPurchases() {
   export async function deletePurchase(id) {
     return await axios.delete(`/api/purchase/purchases/${id}`).then((res) => res.data);
   }
+
+  export async function updatePurchase(values) {
+    return await axios.put(`/api/purchase/purchases/${values.id}`, values).then((res) => res.data);
+  }

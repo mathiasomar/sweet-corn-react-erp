@@ -1,0 +1,88 @@
+// Backend Node.js
+
+const express = require('express');
+const multer = require('multer');
+const mongoose = require('mongoose');
+const app = express();
+
+// Configure MongoDB connection
+mongoose.connect('mongodb://localhost:27017/mydatabase', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+// Set up Multer for file storage
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// Define a Schema and Model for your files
+const fileSchema = new mongoose.Schema({
+  filename: String,
+  path: String,
+  contentType: String,
+});
+
+const File = mongoose.model('File', fileSchema);
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+  const file = new File({
+    filename: req.file.originalname,
+    path: req.file.path,
+    contentType: req.file.mimetype,
+  });
+
+  await file.save();
+  res.send('File uploaded successfully!');
+});
+
+app.listen(3001, () => {
+  console.log('Server running on port 3001');
+});
+
+// Frontend React.js
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const FileUpload = () => {
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post('http://localhost:3001/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      alert('File uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="file" onChange={handleFileChange} />
+      <button type="submit">Upload</button>
+    </form>
+  );
+};
+
+export default FileUpload;
+

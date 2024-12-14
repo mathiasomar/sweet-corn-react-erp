@@ -121,14 +121,14 @@ const PdfDocument = ({ purchase }) => {
               <Text style={styles.col1}>{item.name}</Text>
               <Text style={styles.col2}>{item.quantity}</Text>
               <Text style={styles.col3}>{item.unit}</Text>
-              <Text style={styles.col4}>Ksh.{item.price}</Text>
+              <Text style={styles.col4}>Ksh.{item.price.toLocaleString()}</Text>
             </View>
           ))}
           <View style={styles.row} wrap={false}>
             <Text style={styles.col1}></Text>
             <Text style={styles.col2}></Text>
             <Text style={styles.col3}>Total</Text>
-            <Text style={styles.col4}>Ksh.{purchase.totalAmount}</Text>
+            <Text style={styles.col4}>Ksh.{purchase.totalAmount.toLocaleString()}</Text>
           </View>
           <View style={styles.row} wrap={false}>
             <Text style={styles.col1}></Text>
@@ -145,20 +145,26 @@ const PdfDocument = ({ purchase }) => {
           <View style={styles.row} wrap={false}>
             <Text style={styles.col1}></Text>
             <Text style={styles.col2}></Text>
+            <Text style={styles.col3}>Shipping</Text>
+            <Text style={styles.col4}>Ksh.{purchase.shipping.toLocaleString()}</Text>
+          </View>
+          <View style={styles.row} wrap={false}>
+            <Text style={styles.col1}></Text>
+            <Text style={styles.col2}></Text>
             <Text style={styles.col3}>Grand total</Text>
-            <Text style={styles.col4}>Ksh.{purchase.grandTotal}</Text>
+            <Text style={styles.col4}>Ksh.{purchase.grandTotal.toLocaleString()}</Text>
           </View>
           <View style={styles.row} wrap={false}>
             <Text style={styles.col1}></Text>
             <Text style={styles.col2}></Text>
             <Text style={styles.col3}>Paid</Text>
-            <Text style={styles.col4}>Ksh.{purchase.paid}</Text>
+            <Text style={styles.col4}>Ksh.{purchase.paid.toLocaleString()}</Text>
           </View>
           <View style={styles.row} wrap={false}>
             <Text style={styles.col1}></Text>
             <Text style={styles.col2}></Text>
             <Text style={styles.col3}>Due</Text>
-            <Text style={styles.col4}>Ksh.{purchase.due}</Text>
+            <Text style={styles.col4}>Ksh.{purchase.due.toLocaleString()}</Text>
           </View>
         </View>
       </Page>

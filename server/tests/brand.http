@@ -1,0 +1,24 @@
+### Display All Brands
+GET http://localhost:3000/api/brand/brands HTTP/1.1
+
+### Display brand by id
+GET http://localhost:3000/api/brand/brand/6739aee92c2e3ead8df0ed81 HTTP/1.1
+
+### Add New Brand
+POST http://localhost:3000/api/brand/brands HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "BrandToUpdate"
+}
+
+### Update Brand
+PUT http://localhost:3000/api/brand/brand/6739af382c2e3ead8df0ed8c HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "BrandToUpdate_Updated"
+}
+
+### Delete Brand
+DELETE http://localhost:3000/api/brand/brand/6739af382c2e3ead8df0ed8c HTTP/1.1
